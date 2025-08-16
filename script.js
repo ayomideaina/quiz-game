@@ -47,9 +47,104 @@ const quizQuestions = [
         correct: 3
     },
     {
-        question: "which city has the largest population in Nigeria?",
+        question: "Which city has the largest population in Nigeria?",
         options: ["Abuja", "Ibadan", "Kano", "Lagos"],
         correct: 3
+    },
+    {
+        question: "What is the largest ocean on Earth?",
+        options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+        correct: 3
+    },
+    {
+        question: "What is the smallest continent?",
+        options: ["Europe", "Australia", "Antarctica", "South America"],
+        correct: 1
     }
 ];
 
+
+let currentQuestionIndex = 0;
+let score = 0;
+let answered = false;
+
+function showQuestion() {
+    let currentQuestion = quizQuestions[currentQuestionIndex];
+    questionText.textContent = currentQuestion.question;
+
+    // Clear old buttons
+    optionsContainer.innerHTML = "";
+    answered = false;
+
+    currentQuestion.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.className = "w-full bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex justify-between items-center";
+        button.addEventListener("click", () => checkAnswer(index, button));
+        optionsContainer.appendChild(button);
+    });
+
+    updateProgress();
+}
+
+function checkAnswer(selectedIndex, button) {
+    if (answered) return;
+    answered = true;
+
+    let correctIndex = quizQuestions[currentQuestionIndex].correct;
+    if (selectedIndex === correctIndex) {
+        feedback.innerHTML = `<i class="fa-solid fa-circle-check text-green-400"></i> Correct!`;
+        feedback.className = "mt-4 font-semibold text-green-400";
+        score++;
+    } else {
+        feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400"></i> Wrong! Correct answer: ${quizQuestions[currentQuestionIndex].options[correctIndex]}`;
+        feedback.className = "mt-4 font-semibold text-red-400";
+    }
+
+    scoreDisplay.textContent = `Score: ${score}`;
+
+    Array.from(optionsContainer.children).forEach((btn, i) => {
+        if (i === correctIndex) {
+            btn.classList.add("bg-green-500");
+            btn.innerHTML = `${btn.textContent} <i class="fa-solid fa-circle-check"></i>`;
+        } else if (btn === button) {
+            btn.classList.add("bg-red-500");
+            btn.innerHTML = `${btn.textContent} <i class="fa-solid fa-circle-xmark"></i>`;
+        } else {
+            btn.classList.add("bg-gray-500");
+        }
+        btn.disabled = true;
+    });
+}
+
+function updateProgress() {
+    let progressPercent = ((currentQuestionIndex) / quizQuestions.length) * 100;
+    progressBar.style.width = `${progressPercent}%`;
+    progressText.textContent = `Question ${currentQuestionIndex + 1} of ${quizQuestions.length}`;
+}
+
+function endQuiz() {
+    quizContainer.classList.add("hidden");
+    resultsContainer.classList.remove("hidden");
+    finalScore.textContent = `You scored ${score} out of ${quizQuestions.length}!`;
+}
+
+nextBtn.addEventListener("click", () => {
+    if (!answered) {
+        feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-yellow-400"></i> Please select an answer first!`;
+        feedback.className = "mt-4 font-semibold text-yellow-400";
+        return;
+    }
+
+    currentQuestionIndex++;
+    feedback.textContent = "";
+
+    if (currentQuestionIndex < quizQuestions.length) {
+        showQuestion();
+    } else {
+        endQuiz();
+    }
+});
+
+// Start quiz on page load
+showQuestion();
