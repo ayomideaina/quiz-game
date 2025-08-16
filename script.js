@@ -118,8 +118,6 @@ function checkAnswer(selectedIndex, button) {
 }
 
 function updateProgress() {
-    let progressPercent = ((currentQuestionIndex) / quizQuestions.length) * 100;
-    progressBar.style.width = `${progressPercent}%`;
     progressText.textContent = `Question ${currentQuestionIndex + 1} of ${quizQuestions.length}`;
 }
 
